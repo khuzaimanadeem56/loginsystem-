@@ -12,7 +12,7 @@ import AdminReviews from "./pages/AdminReviews";
 import AddInventory from "./pages/AddInventory";
 import Products from "./pages/Products";
 import Checkout from "./pages/Checkout"; // Naya Checkout page import kiya
-import OrderHistory from "./pages/Orderhistory"; // Naya OrderHistory page import kiya
+import OrderHistory from "./pages/OrderHistory"; // Naya OrderHistory page import kiya
 import AdminOrders from "./pages/AdminOrders";
 import AdminHelp from "./pages/AdminHelp";
 import Cart from "./pages/Cart";
