@@ -1,0 +1,249 @@
+@import "tailwindcss";
+
+/* Light theme overrides when `light-theme` class is present on <html> */
+html.light-theme {
+	--bg-color: #f8fafc;
+	--surface: #ffffff;
+	--muted: #6b7280;
+	--text: #0f172a;
+}
+
+html.light-theme body {
+	background-color: var(--bg-color);
+	color: var(--text);
+}
+
+/* Example: make navbar light when theme enabled */
+html.light-theme nav {
+	background-color: var(--surface) !important;
+	color: var(--text) !important;
+}
+
+/* Smooth transitions for theme changes */
+* {
+	transition: background-color 300ms ease, color 300ms ease, border-color 300ms ease;
+}
+
+/* Additional light-theme variables for consistent contrast */
+html.light-theme {
+	--muted-2: #475569;
+	--border: #e6eef6;
+	--surface-elev: #f7fafc;
+	--heading: #0b1724;
+}
+
+/* Ensure base body/surface/text contrast is strong in light theme */
+html.light-theme body {
+	background-color: var(--bg-color) !important;
+	color: var(--text) !important;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* Make sure primary surfaces and cards are clearly visible */
+html.light-theme .bg-[#111827], html.light-theme .bg-[#0f172a], html.light-theme .bg-[#0a192f], html.light-theme .bg-[#112240] {
+	background-color: var(--surface) !important;
+}
+
+/* Inputs, selects and textareas — clear borders and readable text */
+html.light-theme input, html.light-theme textarea, html.light-theme select, html.light-theme .rounded-2xl {
+	background-color: var(--surface) !important;
+	color: var(--text) !important;
+	border: 1px solid var(--border) !important;
+}
+
+/* Buttons and CTAs should retain their accent but readable on light */
+html.light-theme .bg-cyan-600, html.light-theme .bg-cyan-500 {
+	background-color: #0ea5a4 !important;
+	color: #fff !important;
+}
+html.light-theme .bg-white { background-color: #ffffff !important; }
+
+/* Dropdowns and suggestion panels */
+html.light-theme .shadow-2xl, html.light-theme .shadow-lg, html.light-theme .shadow {
+	box-shadow: 0 10px 30px rgba(15,23,42,0.06) !important;
+}
+html.light-theme .absolute, html.light-theme .rounded-xl { background-color: var(--surface) !important; }
+
+/* Headings and strong text */
+html.light-theme h1, html.light-theme h2, html.light-theme h3, html.light-theme h4, html.light-theme .font-black, html.light-theme .font-bold {
+	color: var(--heading) !important;
+}
+
+/* Ensure small/secondary text is legible */
+html.light-theme .text-gray-400, html.light-theme .text-gray-500, html.light-theme [class*="text-slate-"] {
+	color: var(--muted-2) !important;
+}
+
+/* Utility to preserve white icons on dark badges inside light surfaces */
+.preserve-white { color: #ffffff !important; }
+
+/* Override commonly used dark background utility usages by matching class attribute */
+html.light-theme [class*="bg-[#030712]"] {
+	background-color: var(--bg-color) !important;
+}
+html.light-theme [class*="bg-[#020617]"] {
+	background-color: var(--bg-color) !important;
+}
+html.light-theme [class*="bg-[#111827]"] {
+	background-color: #ffffff !important;
+}
+html.light-theme [class*="bg-[#0f172a]"] {
+	background-color: #ffffff !important;
+}
+
+/* Text color overrides */
+html.light-theme .text-gray-500 { color: var(--muted) !important; }
+html.light-theme .text-gray-300 { color: #4b5563 !important; }
+
+/* Border overrides */
+html.light-theme [class*="border-gray-800"] { border-color: #e5e7eb !important; }
+html.light-theme [class*="border-white/10"] { border-color: rgba(15,23,42,0.06) !important; }
+
+/* Card/surface overrides */
+html.light-theme .rounded-3xl, html.light-theme .rounded-[2rem], html.light-theme .rounded-[2.5rem] {
+	background-color: #ffffff !important;
+}
+
+/* Links & buttons tweaks to remain visible on light */
+html.light-theme .text-cyan-500 { color: #0891b2 !important; }
+html.light-theme .bg-cyan-500\/10 { background-color: rgba(8,145,178,0.06) !important; }
+
+/* Ensure images and icons remain visible */
+html.light-theme svg { filter: none !important; }
+
+/* Improve borders, separators and surface contrast for light theme */
+html.light-theme {
+	--divider: #e6eef6;
+	--surface-2: #f7fafc;
+}
+
+/* Ensure navbar and other bordered containers show crisp separators */
+html.light-theme nav, html.light-theme .border-b, html.light-theme .border {
+	border-color: var(--divider) !important;
+}
+
+/* Make dropdowns, cards and inputs pop slightly from background */
+html.light-theme .shadow-2xl, html.light-theme .shadow {
+	box-shadow: 0 6px 18px rgba(15,23,42,0.04) !important;
+}
+
+html.light-theme input, html.light-theme textarea, html.light-theme select {
+	background-color: var(--surface) !important;
+	color: var(--text) !important;
+	border: 1px solid var(--divider) !important;
+}
+
+/* Replace broad text-white override with a preserve utility for icons/badges */
+html.light-theme .text-gray-400 { color: #6b7280 !important; }
+html.light-theme .text-gray-500 { color: #6b7280 !important; }
+.preserve-white { color: #ffffff !important; }
+
+/* Tighter input focus ring for better visibility */
+html.light-theme input:focus, html.light-theme textarea:focus {
+	box-shadow: 0 0 0 4px rgba(8,145,178,0.06) !important;
+	outline: none !important;
+}
+
+/* Make small dividers (hr-like) consistent */
+html.light-theme hr, html.light-theme .divider {
+	height: 1px; background-color: var(--divider); border: none;
+}
+
+/* Additional overrides to catch hard-coded dark utilities used across admin pages */
+html.light-theme [class*="bg-[#0f172a]"] { background-color: var(--surface) !important; }
+html.light-theme [class*="bg-[#111827]"] { background-color: var(--surface-2) !important; }
+html.light-theme [class*="bg-[#0a192f]"] { background-color: var(--surface) !important; }
+html.light-theme [class*="bg-[#112240]"] { background-color: var(--surface-2) !important; }
+html.light-theme [class*="bg-[#020617]"] { background-color: var(--surface-2) !important; }
+html.light-theme [class*="bg-[#030712]"] { background-color: var(--surface-2) !important; }
+html.light-theme [class*="bg-[#1A1D2B]"] { background-color: var(--surface) !important; }
+html.light-theme [class*="bg-[#11131f]"] { background-color: var(--surface-2) !important; }
+
+/* Catch classes with opacity modifiers like /50 or /20 */
+html.light-theme [class*="bg-[#111827]/"] { background-color: rgba(255,255,255,0.9) !important; }
+html.light-theme [class*="bg-[#0f172a]/"] { background-color: rgba(255,255,255,0.95) !important; }
+
+/* Inline style backgrounds set in JS (e.g., style={{ background: '#020617' }}) */
+html.light-theme [style*="#020617"] { background-color: var(--surface-2) !important; }
+html.light-theme [style*="#030712"] { background-color: var(--surface-2) !important; }
+html.light-theme [style*="#0f172a"] { background-color: var(--surface) !important; }
+
+/* Text overrides for slate and subtle color utilities */
+html.light-theme [class*="text-slate-"] { color: var(--muted) !important; }
+html.light-theme .text-slate-200, html.light-theme .text-slate-300, html.light-theme .text-slate-400, html.light-theme .text-slate-500, html.light-theme .text-slate-600 { color: #475569 !important; }
+html.light-theme .text-white { color: var(--text) !important; }
+html.light-theme .text-cyan-500 { color: #0891b2 !important; }
+html.light-theme .text-emerald-500 { color: #10b981 !important; }
+
+/* Borders used in many components */
+html.light-theme [class*="border-white/10"] { border-color: rgba(15,23,42,0.06) !important; }
+html.light-theme [class*="border-white/5"] { border-color: rgba(15,23,42,0.04) !important; }
+html.light-theme [class*="border-gray-800"] { border-color: var(--divider) !important; }
+html.light-theme [class*="border-gray-800/"] { border-color: var(--divider) !important; }
+
+/* Cards, modals and elevated surfaces */
+html.light-theme .rounded-[2.5rem], html.light-theme .rounded-3xl, html.light-theme .rounded-[2rem] {
+	background: linear-gradient(180deg, var(--surface), var(--surface-2)) !important;
+}
+
+/* Ensure dropdowns and overlays are visible */
+html.light-theme .shadow-2xl, html.light-theme .shadow-lg {
+	box-shadow: 0 8px 30px rgba(15,23,42,0.06) !important;
+}
+
+/* Keep CTA and cyan colors pleasant on light */
+html.light-theme .bg-cyan-600, html.light-theme .bg-cyan-500 { background-color: #0ea5a4 !important; }
+html.light-theme .text-cyan-500 { color: #0ea5a4 !important; }
+
+/* Special: ensure high-contrast headings remain strong */
+html.light-theme h1, html.light-theme h2, html.light-theme h3, html.light-theme h4 {
+	color: var(--text) !important;
+}
+
+/* Scrollbar styling (theme-aware). Applies to WebKit and Firefox. */
+:root {
+	--scrollbar-width: 10px;
+	--scrollbar-bg: rgba(2,6,23,0.35); /* dark track */
+	--scrollbar-thumb: #06b6d4; /* tailwind text-cyan-500 */
+	--scrollbar-thumb-hover: #0891b2; /* tailwind cyan-600 */
+}
+
+html.light-theme {
+	--scrollbar-bg: #f1f5f9; /* light track */
+	--scrollbar-thumb: #06b6d4; /* tailwind text-cyan-500 (same across themes) */
+	--scrollbar-thumb-hover: #0891b2;
+}
+
+/* Firefox */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+}
+
+/* WebKit browsers */
+*::-webkit-scrollbar {
+	width: var(--scrollbar-width);
+	height: var(--scrollbar-width);
+	background: transparent;
+}
+*::-webkit-scrollbar-track {
+	background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+	background-color: var(--scrollbar-thumb);
+	border-radius: 999px;
+	border: 3px solid transparent;
+	background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+	background-color: var(--scrollbar-thumb-hover);
+}
+
+/* Make sure explicit scrollable containers (custom-scrollbar) also inherit */
+.custom-scrollbar {
+	scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+}
+
+
+
