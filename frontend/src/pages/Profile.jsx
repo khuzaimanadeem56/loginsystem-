@@ -59,12 +59,12 @@ function Profile() {
 
         <Navbar user={user} />
 
-        <main className="flex-1 overflow-y-auto p-6 lg:p-12 custom-scrollbar relative z-10">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-12 custom-scrollbar relative z-10">
           
           {/* Top Hero Section */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
             <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
-              <h1 className="text-5xl font-black italic tracking-tighter text-white uppercase leading-none">
+              <h1 className="text-3xl sm:text-5xl font-black italic tracking-tighter text-white uppercase leading-none">
                 My <span className="text-cyan-500 text-stroke-white">Profile</span>
               </h1>
               <div className="flex items-center gap-2 mt-2">
@@ -156,9 +156,9 @@ function Profile() {
                 initial={{ rotateX: 20, y: 50, opacity: 0 }}
                 animate={{ rotateX: 0, y: 0, opacity: 1 }}
                 exit={{ rotateX: 20, y: 50, opacity: 0 }}
-                className="bg-[#0f172a] border border-cyan-500/30 w-full max-w-2xl rounded-[3rem] p-1 shadow-[0_0_50px_rgba(6,182,212,0.2)] relative z-10"
+                className="bg-[#0f172a] border border-cyan-500/30 w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar rounded-3xl sm:rounded-[3rem] p-1 shadow-[0_0_50px_rgba(6,182,212,0.2)] relative z-10"
               >
-                <div className="bg-[#020617] rounded-[2.8rem] p-10">
+                <div className="bg-[#020617] rounded-3xl sm:rounded-[2.8rem] p-5 sm:p-10">
                   <div className="flex justify-between items-start mb-10">
                     <div>
                       <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase">Modify <span className="text-cyan-500">Core</span></h2>
@@ -187,7 +187,7 @@ function Profile() {
                     {/* Right: Form Inputs */}
                     <div className="md:col-span-8 space-y-5">
                       <CyberInput label="Name" value={form.name} onChange={(v) => setForm({...form, name: v})} />
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <CyberInput label="Phone |Number" value={form.phone} onChange={(v) => setForm({...form, phone: v})} type="number" />
                         <div className="space-y-2">
                            <p className="text-[9px] font-black text-cyan-500 uppercase tracking-widest ml-1 italic">Gender</p>

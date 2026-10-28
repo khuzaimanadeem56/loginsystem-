@@ -39,14 +39,12 @@ import { motion } from "framer-motion";
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#030712] text-white">
-      <div className="h-full border-r border-gray-800 flex-shrink-0">
-        <Sidebar />
-      </div>
+      <Sidebar />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         <Navbar user={user} />
 
-        <main className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar">
           <div className="max-w-6xl mx-auto">
             <header className="mb-10">
            <motion.h2 
@@ -74,11 +72,11 @@ import { motion } from "framer-motion";
                     initial={{ opacity: 0, x: -10 }} 
                     animate={{ opacity: 1, x: 0 }}
                     key={order._id} 
-                    className="bg-[#111827] border border-gray-800 rounded-3xl p-6 hover:border-gray-700 transition-all group"
+                    className="bg-[#111827] border border-gray-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 hover:border-gray-700 transition-all group"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-6">
                       {/* Product Info */}
-                      <div className="flex items-center gap-4 min-w-[250px]">
+                      <div className="flex items-center gap-4 min-w-0 sm:min-w-[250px] w-full sm:w-auto">
                         <div className="w-16 h-16 bg-[#030712] rounded-2xl border border-gray-800 flex items-center justify-center overflow-hidden">
                           {/* Yahan aap product image bhi dikha sakte hain agar API se aa rahi ho */}
                           <ShoppingBag className="text-gray-700" size={24} />

@@ -59,9 +59,7 @@ function Reviews() {
     <div className="flex h-screen overflow-hidden bg-[#030712] text-slate-200">
       
       {/* Sidebar */}
-      <div className="h-full border-r border-white/5 flex-shrink-0">
-        <Sidebar />
-      </div>
+      <Sidebar />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full relative overflow-hidden">
@@ -72,7 +70,7 @@ function Reviews() {
 
         <Navbar user={stored} />
 
-        <main className="flex-1 flex items-center justify-center p-6 relative z-10">
+        <main className="flex-1 overflow-y-auto flex items-center justify-center p-4 sm:p-6 relative z-10 custom-scrollbar">
           
           <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
@@ -105,7 +103,7 @@ function Reviews() {
               {/* Card Glow Effect */}
               <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
               
-              <div className="relative bg-[#0b1120]/80 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl p-8 md:p-10">
+              <div className="relative bg-[#0b1120]/80 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10">
                 <form onSubmit={submitReview} className="space-y-5">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="p-2 bg-cyan-500/20 rounded-lg text-cyan-400">

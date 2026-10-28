@@ -81,14 +81,14 @@ function Dashboard() {
         
         <Navbar user={user} />
 
-        <main className="flex-1 overflow-y-auto p-6 lg:p-10 custom-scrollbar relative z-10 space-y-8">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 custom-scrollbar relative z-10 space-y-6 sm:space-y-8">
           
           {/* HEADER WITH TOP-RIGHT WEATHER */}
           <div className="flex flex-col md:flex-row justify-between items-start gap-4">
             <div>
               <motion.h1 
                 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
-                className="text-4xl font-black tracking-tighter text-white uppercase italic"
+                className="text-2xl sm:text-4xl font-black tracking-tighter text-white uppercase italic"
               >
                 Welcome, <span className="text-cyan-500">{user?.name?.split(' ')[0]}</span>
               </motion.h1>
@@ -100,7 +100,7 @@ function Dashboard() {
             {/* LIVE WEATHER WIDGET (Top Right) */}
             <motion.div 
               initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
-              className={`${cardBg} rounded-2xl px-5 py-3 flex items-center gap-4`}
+              className={`${cardBg} rounded-2xl px-4 sm:px-5 py-3 flex items-center justify-between sm:justify-start gap-4 w-full sm:w-auto`}
             >
               <div className="text-right">
                 <p className="text-[10px] font-black text-cyan-500 uppercase tracking-widest leading-none mb-1">{weather.city}</p>
@@ -118,7 +118,7 @@ function Dashboard() {
           </div>
 
           {/* 4 MAIN CARDS */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             <StatCard isLight={isLight} title="Orders Placed" value={stats.myOrders} icon={ShoppingBag} color="cyan" trend="Recent" />
             <StatCard isLight={isLight} title="Support Desk" value={stats.activeTickets} icon={MessageSquare} color="purple" trend="1 Active" />
             <StatCard isLight={isLight} title="My Wishlist" value={stats.savedItems} icon={Zap} color="emerald" trend="In Stock" />
@@ -127,12 +127,12 @@ function Dashboard() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Logistics Map */}
-            <div className={`lg:col-span-8 ${cardBg} rounded-[2.5rem] p-8 relative overflow-hidden group`}>
+            <div className={`lg:col-span-8 ${cardBg} rounded-2xl sm:rounded-[2.5rem] p-5 sm:p-8 relative overflow-hidden group`}>
               <div className="flex justify-between items-center mb-6 relative z-10">
                 <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Global Logistics Trace</h3>
                 <Globe size={18} className="text-cyan-500 animate-pulse" />
               </div>
-              <div className="h-[280px] flex items-center justify-center opacity-10">
+              <div className="h-[200px] sm:h-[280px] flex items-center justify-center opacity-10">
                  <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg" className="w-full h-full object-contain invert" alt="Map" />
               </div>
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
@@ -143,7 +143,7 @@ function Dashboard() {
 
             {/* REWARDS & LOYALTY CARD (Right Column) */}
             <div className="lg:col-span-4 space-y-6">
-              <div className={`${isLight ? 'bg-gradient-to-br from-blue-50 to-cyan-50 border-gray-200 text-slate-800' : 'bg-gradient-to-br from-[#1A1D2B] to-[#11131f] border-white/5 text-white'} border rounded-[2.5rem] p-8 flex flex-col justify-between relative overflow-hidden group shadow-2xl h-[220px]`}>
+              <div className={`${isLight ? 'bg-gradient-to-br from-blue-50 to-cyan-50 border-gray-200 text-slate-800' : 'bg-gradient-to-br from-[#1A1D2B] to-[#11131f] border-white/5 text-white'} border rounded-2xl sm:rounded-[2.5rem] p-5 sm:p-8 flex flex-col justify-between relative overflow-hidden group shadow-2xl h-[220px]`}>
                 <Gift className="absolute -right-4 -bottom-4 text-cyan-500/10 group-hover:scale-110 transition-transform" size={120} />
                 <div>
                   <div className="flex justify-between items-start mb-4">
@@ -171,7 +171,7 @@ function Dashboard() {
 
           {/* BOTTOM SECTION - Purchase Analytics & Task Manager */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-10">
-            <div className={`lg:col-span-8 ${cardBg} rounded-[2.5rem] p-8`}>
+            <div className={`lg:col-span-8 ${cardBg} rounded-2xl sm:rounded-[2.5rem] p-5 sm:p-8`}>
                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-8">Shopping Activity Analytics</h3>
                <div className="h-[200px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
@@ -190,7 +190,7 @@ function Dashboard() {
                </div>
             </div>
 
-            <div className={`lg:col-span-4 ${cardBg} rounded-[2.5rem] p-8`}>
+            <div className={`lg:col-span-4 ${cardBg} rounded-2xl sm:rounded-[2.5rem] p-5 sm:p-8`}>
                <h3 className={`text-[10px] font-black ${isLight ? 'text-slate-600' : 'text-slate-500'} uppercase tracking-[0.3em] mb-6 flex items-center gap-2`}><ListTodo size={14} /> My Action Items</h3>
                <div className="space-y-4">
                   <ReminderItem isLight={isLight} label="Complete Profile Verification" time="Security" color="bg-rose-500" />

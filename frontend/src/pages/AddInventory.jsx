@@ -116,15 +116,13 @@ function AddInventory() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#030712] text-white">
-      <div className="h-full border-r border-gray-800 flex-shrink-0">
-        <Sidebar />
-      </div>
+      <Sidebar />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         <Navbar user={user} />
 
-        <main className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-          <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-4">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-10 gap-4">
            <motion.h2 
                 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
                 className="text-3xl font-black tracking-tighter text-white uppercase italic"
@@ -147,7 +145,7 @@ function AddInventory() {
           {/* Modal */}
           {showModal && (
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-              <div className="bg-[#111827] border border-gray-800 rounded-2xl w-full max-w-4xl p-8 shadow-2xl relative">
+              <div className="bg-[#111827] border border-gray-800 rounded-2xl w-full max-w-4xl p-5 sm:p-8 max-h-[92vh] overflow-y-auto custom-scrollbar shadow-2xl relative">
                 <div className="flex items-start justify-between mb-8">
                   <h3 className="text-2xl font-bold text-cyan-500 uppercase tracking-widest">
                     {editingId ? 'Edit Product' : 'Create Product'}

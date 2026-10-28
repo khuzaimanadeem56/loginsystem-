@@ -84,10 +84,10 @@ function AdminDashboard() {
       <Sidebar />
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         <Navbar user={user} />
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar space-y-6">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 custom-scrollbar space-y-5 sm:space-y-6">
           
           {/* 1. TOP 4 CARDS */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <StatsCard isLight={isLight} label="Total Users" targetValue={stats.totalUsers} change="+10%" icon={Users} color="text-emerald-500" />
             <StatsCard isLight={isLight} label="Our Products" targetValue={stats.totalProducts} change="-7%" icon={Package} color="text-rose-500" />
             <StatsCard isLight={isLight} label="Unique Oders" targetValue={stats.totalOrders} change="-12%" icon={Globe} color="text-cyan-500" />
@@ -101,7 +101,7 @@ function AdminDashboard() {
                 <h3 className="font-black uppercase text-[10px] tracking-[0.2em] text-slate-500">Site Visits / Global</h3>
                 <TrendingUp size={16} className="text-cyan-500" />
               </div>
-              <div className="relative h-[320px] flex items-center justify-center opacity-40">
+              <div className="relative h-[200px] sm:h-[320px] flex items-center justify-center opacity-40">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg" 
                      className={`w-full h-full object-contain ${isLight ? '' : 'invert'}`} alt="World Map" />
                 <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-cyan-500 rounded-full animate-ping" />

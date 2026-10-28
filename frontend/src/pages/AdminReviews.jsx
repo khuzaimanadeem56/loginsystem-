@@ -61,9 +61,7 @@ function AdminReviews() {
   return (
     // 'scroll-smooth' class add ki gayi hai smooth scrolling ke liye
     <div className="flex h-screen overflow-hidden bg-[#030712] text-white scroll-smooth">
-      <div className="h-full border-r border-gray-800 flex-shrink-0">
-        <Sidebar />
-      </div>
+      <Sidebar />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         <Navbar user={user} />

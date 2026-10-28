@@ -39,20 +39,18 @@ function Products() {
     <div className="flex h-screen overflow-hidden bg-[#030712]">
       
       {/* Sidebar - Fixed */}
-      <div className="h-full border-r border-gray-800 flex-shrink-0">
-        <Sidebar />
-      </div>
+      <Sidebar />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         <Navbar user={user} />
 
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 custom-scrollbar">
           
           {/* Header & Search Bar */}
-          <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between mb-6 sm:mb-10 gap-4">
           <motion.h2 
                 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
-                className="text-3xl font-black tracking-tighter text-white uppercase italic"
+                className="text-2xl sm:text-3xl font-black tracking-tighter text-white uppercase italic"
               >
                 
                 Market <span className="text-cyan-500">Place</span>
@@ -72,7 +70,7 @@ function Products() {
           </div>
 
           {/* Products Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 pb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-8 pb-10">
             {items
               .filter((it) => {
                 if (!search) return true;

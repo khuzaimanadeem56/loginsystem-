@@ -134,9 +134,7 @@ function Cart() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#030712] text-slate-200">
-      <div className="h-full border-r border-gray-800/50 flex-shrink-0">
-        <Sidebar />
-      </div>
+      <Sidebar />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         <Navbar user={JSON.parse(localStorage.getItem('user'))} />
@@ -169,7 +167,7 @@ function Cart() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       key={it._id} 
-                      className="bg-[#111827] border border-gray-800/50 rounded-3xl p-4 flex items-center gap-6 group hover:border-gray-700 transition-all"
+                      className="bg-[#111827] border border-gray-800/50 rounded-2xl sm:rounded-3xl p-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 group hover:border-gray-700 transition-all"
                     >
                       <div className="w-24 h-24 rounded-2xl overflow-hidden border border-white/5 bg-black">
                         <img src={`${API}${it.image}`} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -191,8 +189,9 @@ function Cart() {
                         </div>
                       </div>
 
-                      <div className="text-right hidden sm:block">
-                        <div className="text-white font-black text-xl">RS. {(Number(it.sale || it.price || 0) * (it.quantity || 1)).toLocaleString()}</div>
+                      <div className="text-right sm:block w-full sm:w-auto flex justify-between items-center sm:justify-end pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                        <span className="text-xs text-gray-500 sm:hidden">Item Total:</span>
+                        <div className="text-white font-black text-lg sm:text-xl">RS. {(Number(it.sale || it.price || 0) * (it.quantity || 1)).toLocaleString()}</div>
                       </div>
                     </motion.div>
                   ))
@@ -261,7 +260,7 @@ function Cart() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-xl bg-[#0f172a] border border-white/10 rounded-[2.5rem] p-8 overflow-hidden shadow-2xl"
+              className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto custom-scrollbar bg-[#0f172a] border border-white/10 rounded-3xl sm:rounded-[2.5rem] p-5 sm:p-8 shadow-2xl"
             >
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-emerald-500" />
               

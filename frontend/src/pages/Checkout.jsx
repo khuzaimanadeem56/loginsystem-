@@ -97,14 +97,14 @@ function Checkout() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-12">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-12">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
           
           {/* Left Side */}
           <div className="lg:col-span-7 space-y-6">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-[#0f172a]/60 border border-white/5 rounded-[2rem] p-8 backdrop-blur-md">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-[#0f172a]/60 border border-white/5 rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 backdrop-blur-md">
               <h2 className="text-xl font-black text-white mb-6 tracking-tight uppercase">1. Shipping Details</h2>
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-slate-500 ml-1 uppercase">Full Name</p>
                   <input readOnly value={userData.name} className="w-full bg-[#020617] border border-white/5 rounded-xl px-5 py-3 text-slate-400 outline-none" />
@@ -143,7 +143,7 @@ function Checkout() {
 
           {/* Right Side: Summary */}
           <div className="lg:col-span-5">
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-[#111827] border border-white/10 rounded-[2.5rem] p-8 shadow-2xl sticky top-10">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-[#111827] border border-white/10 rounded-2xl sm:rounded-[2.5rem] p-5 sm:p-8 shadow-2xl sticky top-6 sm:top-10">
               <h3 className="text-[10px] font-black text-cyan-500 mb-6 uppercase tracking-[0.2em]">Order Summary</h3>
               
               <div className="flex items-center gap-4 bg-black/20 p-4 rounded-2xl border border-white/5 mb-6">

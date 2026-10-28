@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaSearch, FaBell, FaCog, FaStar } from "react-icons/fa";
+import { Menu } from "lucide-react";
 
 function Navbar({ user }) {
   const [open, setOpen] = useState(false);
@@ -78,7 +79,6 @@ function Navbar({ user }) {
 
   // build route suggestions
   const getRouteSuggestions = (q) => {
-    // Provide different suggestion sets depending on admin vs user
     if (isAdmin) {
       const adminRoutes = [
         { keys: ['dashboard', 'home'], path: '/admin/dashboard', label: 'Admin Dashboard' },
@@ -118,7 +118,7 @@ function Navbar({ user }) {
     return res;
   };
 
-  // fetch product suggestions (simple client-side filter)
+  // fetch product suggestions
   const fetchProductSuggestions = async (q) => {
     if (!q) return [];
     try {
@@ -152,7 +152,6 @@ function Navbar({ user }) {
     }, 250);
   };
 
-  // Search action when Enter pressed without selecting suggestion
   const performFallbackSearch = (q) => {
     if (!q) return;
     navigate(`/products?q=${encodeURIComponent(q)}`);
@@ -199,7 +198,7 @@ function Navbar({ user }) {
 
   const firstLetter = user?.name?.charAt(0).toUpperCase();
 
-  const navBase = 'px-6 py-3 flex justify-between items-center relative border-b';
+  const navBase = 'px-3 sm:px-6 py-2.5 sm:py-3 flex justify-between items-center relative border-b flex-shrink-0';
   const navClass = theme === 'light'
     ? `${navBase} bg-white text-black border-gray-200`
     : `${navBase} bg-[#0a192f] text-white border-gray-800`;
@@ -208,32 +207,44 @@ function Navbar({ user }) {
 
   return (
     <nav className={navClass}>
-      {/* LEFT SIDE: Brand */}
-      <div className="flex items-center">
-        <h2 className="font-bold text-xl tracking-tight cursor-pointer" onClick={() => navigate("/dashboard")}>
+      {/* LEFT SIDE: Mobile Menu Trigger + Brand / Page Title */}
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        {/* Mobile Hamburger Menu Toggle */}
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new CustomEvent('toggle-sidebar'))}
+          className="p-2 -ml-1 text-slate-300 hover:text-white rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 md:hidden transition-colors cursor-pointer"
+          aria-label="Toggle Sidebar Navigation"
+        >
+          <Menu size={19} />
+        </button>
+
+        <h2
+          className="font-bold text-base sm:text-xl tracking-tight cursor-pointer truncate max-w-[150px] sm:max-w-none"
+          onClick={() => navigate(isAdmin ? "/admin/dashboard" : "/dashboard")}
+        >
           {title}
         </h2>
       </div>
 
-      {/* RIGHT SIDE: Search, Icons & Profile */}
-      <div className="flex items-center gap-4">
-        
-        {/* 🔍 SEARCH BAR (Added Logic) */}
+      {/* RIGHT SIDE: Search, Theme Toggle, Notification & Profile */}
+      <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+        {/* Search Bar - hidden on small mobile, visible from md up */}
         <div className="relative hidden md:block">
           <input
             type="text"
             placeholder="Search name, data, or page..."
-            className={`${searchBg} rounded-full py-1.5 px-4 pl-10 focus:outline-none focus:ring-1 focus:ring-cyan-400 w-64 transition-all`}
+            className={`${searchBg} rounded-full py-1.5 px-4 pl-10 focus:outline-none focus:ring-1 focus:ring-cyan-400 w-56 lg:w-64 transition-all`}
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); updateSuggestions(e.target.value); }}
             onKeyDown={handleInputKeyDown}
             onFocus={() => { if (suggestions.length) setShowSuggestions(true); }}
           />
-          <FaSearch className="absolute left-3 top-2.5 text-gray-500 size={14}" />
+          <FaSearch className="absolute left-3 top-2.5 text-gray-500" size={13} />
 
           {/* Suggestions dropdown */}
           {showSuggestions && (
-            <div className="absolute mt-2 left-0 w-80 bg-[#0b1724] text-white rounded-xl shadow-2xl overflow-hidden z-50">
+            <div className="absolute mt-2 left-0 w-80 bg-[#0b1724] text-white rounded-xl shadow-2xl overflow-hidden z-50 border border-white/10">
               <ul>
                 {suggestions.map((s, idx) => (
                   <li
@@ -250,52 +261,57 @@ function Navbar({ user }) {
           )}
         </div>
 
-        {/* Toggle Switch (Image style) */}
-        <div onClick={toggleTheme} title="Toggle theme" className="flex items-center rounded-full px-2 py-1 gap-1 cursor-pointer ml-2">
+        {/* Theme Toggle Button */}
+        <div
+          onClick={toggleTheme}
+          title="Toggle theme"
+          className="flex items-center rounded-full px-1.5 py-1 gap-1 cursor-pointer"
+        >
           <div className={theme === 'light' ? 'bg-black rounded-full p-1' : 'bg-white rounded-full p-1'}>
             <FaStar className={theme === 'light' ? 'text-white preserve-white text-[10px]' : 'text-[#00bcd4] text-[10px]'} />
           </div>
         </div>
 
-        {/* Action Icons */}
-        <button className="text-gray-400 hover:text-white transition-colors">
-          <FaBell size={18} />
-        </button>
-        <button className="text-gray-400 hover:text-white transition-colors">
-          <FaCog size={18} />
+        {/* Notification Icon */}
+        <button className="text-gray-400 hover:text-white transition-colors p-1" aria-label="Notifications">
+          <FaBell size={16} />
         </button>
 
-        {/* Profile Section */}
-        <div className="relative flex items-center gap-2 ml-2 cursor-pointer" onClick={() => setOpen(!open)}>
+        {/* Settings Icon - hidden on very small screens to maintain breathing space */}
+        <button className="text-gray-400 hover:text-white transition-colors p-1 hidden sm:block" aria-label="Settings">
+          <FaCog size={16} />
+        </button>
+
+        {/* Profile Avatar & Dropdown */}
+        <div className="relative flex items-center cursor-pointer ml-1" onClick={() => setOpen(!open)}>
           {imageUrl ? (
             <img
               src={imageUrl}
               alt="profile"
-              className="w-9 h-9 rounded-full object-cover border-2 border-cyan-500"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border-2 border-cyan-500"
             />
           ) : (
-            <div className="w-9 h-9 rounded-full bg-cyan-600 text-white flex items-center justify-center font-bold">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-cyan-600 text-white flex items-center justify-center font-bold text-xs sm:text-sm">
               {firstLetter}
             </div>
           )}
           
-          {/* Dropdown */}
+          {/* Dropdown Menu */}
           {open && (
             (() => {
               const dropdownClass = theme === 'light'
-                ? 'absolute right-0 top-12 bg-white text-black rounded-lg shadow-2xl w-44 overflow-hidden border border-gray-200 z-50'
-                : 'absolute right-0 top-12 bg-[#112240] text-white rounded-lg shadow-2xl w-44 overflow-hidden border border-gray-700 z-50';
+                ? 'absolute right-0 top-11 bg-white text-black rounded-xl shadow-2xl w-44 overflow-hidden border border-gray-200 z-50'
+                : 'absolute right-0 top-11 bg-[#112240] text-white rounded-xl shadow-2xl w-44 overflow-hidden border border-gray-700 z-50';
               const headerClass = theme === 'light' ? 'p-3 border-b border-gray-200 text-xs text-gray-600' : 'p-3 border-b border-gray-700 text-xs text-gray-400';
               const liHover = theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-[#1d3557]';
               const logoutClass = theme === 'light' ? 'p-3 hover:bg-red-50 cursor-pointer text-red-600 border-t border-gray-200' : 'p-3 hover:bg-red-900/30 cursor-pointer text-red-400 border-t border-gray-700';
               return (
                 <div className={dropdownClass}>
                   <div className={headerClass}>
-                    Logged in as: <br/><span className={theme === 'light' ? 'text-black font-semibold' : 'text-white font-semibold'}>{user?.name}</span>
+                    Logged in as: <br/><span className={theme === 'light' ? 'text-black font-semibold truncate block' : 'text-white font-semibold truncate block'}>{user?.name}</span>
                   </div>
                   <ul className="text-sm">
                     <li onClick={() => navigate("/profile")} className={`p-3 ${liHover} cursor-pointer`}>Profile</li>
-                    <li className={`p-3 ${liHover} cursor-pointer`}>Settings</li>
                     <li onClick={logout} className={logoutClass}>Logout</li>
                   </ul>
                 </div>
