@@ -5,6 +5,7 @@ import { Users, Package, ShoppingBag, MessageSquare, Activity, Globe, CheckCircl
 import { motion } from "framer-motion";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { LoadingContext } from '../contexts/LoadingContext';
+import { API_URL } from "../config/api";
 
 function AdminDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -38,10 +39,10 @@ function AdminDashboard() {
         
         // --- FETCHING STATS & WEATHER IN PARALLEL ---
         const [u, p, o, r, w] = await Promise.all([
-          fetch("http://localhost:5000/auth/users"),
-          fetch("http://localhost:5000/inventory"),
-          fetch("http://localhost:5000/orders/admin/all"),
-          fetch("http://localhost:5000/reviews"),
+          fetch(`${API_URL}/auth/users`),
+          fetch(`${API_URL}/inventory`),
+          fetch(`${API_URL}/orders/admin/all`),
+          fetch(`${API_URL}/reviews`),
           // Accurate Open-Meteo for Multan Lat/Long
           fetch("https://api.open-meteo.com/v1/forecast?latitude=30.1575&longitude=71.5249&current_weather=true")
         ]);

@@ -3,12 +3,11 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { ShoppingBag, Clock, CheckCircle2, XCircle, Receipt, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
+import { API_URL as API } from "../config/api";
 
  function OrderHistory() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const API = "http://localhost:5000";
-  
   const user = JSON.parse(localStorage.getItem("user")) || null;
 
   useEffect(() => {

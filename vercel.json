@@ -3,6 +3,7 @@
   "services": {
     "backend": {
       "root": "backend",
+      "framework": "express",
       "entrypoint": "server.js"
     },
     "frontend": {
@@ -13,15 +14,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": {
-        "service": "backend"
-      }
+      "destination": { "service": "backend" }
     },
     {
       "source": "/(.*)",
-      "destination": {
-        "service": "frontend"
-      }
+      "destination": { "service": "frontend" }
     }
   ]
 }

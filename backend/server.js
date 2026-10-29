@@ -17,16 +17,26 @@ app.use(express.json());
 
 connectDB();
 
-app.use("/auth", authRoutes);
+const mountRoutes = (path, router) => {
+  app.use(path, router);
+  app.use(`/api${path}`, router);
+};
+
+app.get(["/health", "/api/health"], (_req, res) => {
+  res.json({ ok: true });
+});
+
+mountRoutes("/auth", authRoutes);
 app.use("/uploads", express.static("uploads"));
-app.use("/reviews", reviewRoutes);
-app.use("/inventory", inventoryRoutes);
-app.use("/orders", orderRoutes); // 2. Yahan register karein
-app.use("/stripe", stripeRoutes);
-app.use("/help", helpRoutes);
+app.use("/api/uploads", express.static("uploads"));
+mountRoutes("/reviews", reviewRoutes);
+mountRoutes("/inventory", inventoryRoutes);
+mountRoutes("/orders", orderRoutes);
+mountRoutes("/stripe", stripeRoutes);
+mountRoutes("/help", helpRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
 export default app;

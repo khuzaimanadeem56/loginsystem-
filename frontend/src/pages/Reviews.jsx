@@ -3,11 +3,11 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { Star, Send, Sparkles, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
+import { API_URL as API } from "../config/api";
 
 function Reviews() {
   const stored = JSON.parse(localStorage.getItem("user") || "null");
   const [form, setForm] = useState({ rating: 0, name: "", title: "", comment: "" });
-
   // Prefill logic (No changes)
   useEffect(() => {
     if (stored?.name) {
@@ -15,7 +15,7 @@ function Reviews() {
       return;
     }
     if (stored?._id) {
-      fetch(`http://localhost:5000/auth/profile/${stored._id}`)
+      fetch(`${API}/auth/profile/${stored._id}`)
         .then(r => r.ok ? r.json() : null)
         .then(profile => {
           if (profile && profile.name) {
@@ -38,7 +38,7 @@ function Reviews() {
     }
 
     // Original Backend Logic
-    const res = await fetch("http://localhost:5000/reviews", {
+    const res = await fetch(`${API}/reviews`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

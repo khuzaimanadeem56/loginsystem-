@@ -3,6 +3,7 @@ import { jsPDF } from "jspdf";
 import { motion } from "framer-motion";
 import { CheckCircle2, Download, ArrowRight, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
+import { API_URL } from "../config/api";
 
 function Success() {
   const { state } = useLocation();
@@ -21,35 +22,9 @@ function Success() {
         try {
           setLoading(true);
           console.log('[Success] session_id detected:', sessionId);
-          // Try relative first (works if proxy configured), otherwise try backend host
-          const backendBase = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-          const tried = [];
-          let res;
-          try {
-            const relUrl = `/stripe/session/${encodeURIComponent(sessionId)}`;
-            tried.push(relUrl);
-            res = await fetch(relUrl);
-            if (!res.ok) {
-              res = null;
-            }
-          } catch (e) {
-            console.warn('[Success] relative fetch failed', e);
-            res = null;
-          }
-
-          if (!res) {
-            try {
-              const abs = `${backendBase}/stripe/session/${encodeURIComponent(sessionId)}`;
-              tried.push(abs);
-              res = await fetch(abs);
-            } catch (e) {
-              console.warn('[Success] backend fetch failed', e);
-              res = null;
-            }
-          }
-
-          console.log('[Success] fetch attempts:', tried, 'response ok?', !!res && res.ok);
-          if (!res || !res.ok) {
+          const res = await fetch(`${API_URL}/stripe/session/${encodeURIComponent(sessionId)}`);
+          console.log('[Success] session fetch ok?', res.ok);
+          if (!res.ok) {
             throw new Error('Session fetch failed');
           }
 
@@ -59,23 +34,11 @@ function Success() {
           // Try to mark pending orders Approved for local testing (if webhook not configured)
           (async () => {
             try {
-              const backendBase = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-              const triedMark = [];
-              let markRes = null;
-              try {
-                const relMark = `/stripe/debug/mark-approved/${encodeURIComponent(sessionId)}`;
-                triedMark.push(relMark);
-                markRes = await fetch(relMark, { method: 'POST' });
-                if (!markRes.ok) markRes = null;
-              } catch (e) { markRes = null; }
-              if (!markRes) {
-                try {
-                  const absMark = `${backendBase}/stripe/debug/mark-approved/${encodeURIComponent(sessionId)}`;
-                  triedMark.push(absMark);
-                  markRes = await fetch(absMark, { method: 'POST' });
-                } catch (e) { markRes = null; }
-              }
-              console.log('[Success] mark-approved attempts:', triedMark, 'ok?', !!markRes && markRes.ok);
+              const markRes = await fetch(
+                `${API_URL}/stripe/debug/mark-approved/${encodeURIComponent(sessionId)}`,
+                { method: 'POST' }
+              );
+              console.log('[Success] mark-approved ok?', markRes.ok);
             } catch (e) {
               console.warn('[Success] mark-approved failed', e);
             }

@@ -3,11 +3,11 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { Search } from "lucide-react";
 import { motion } from "framer-motion";
+import { API_URL as API } from "../config/api";
 
 function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [search, setSearch] = useState("");
-  const API = "http://localhost:5000";
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {

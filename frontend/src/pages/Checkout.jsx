@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, ArrowLeft, ShieldCheck, Smartphone, Landmark, X, Copy, CreditCard } from "lucide-react";
 import { useState, useEffect } from "react";
+import { API_URL as API } from "../config/api";
 
 function Checkout() {
   const location = useLocation();
@@ -14,8 +15,6 @@ function Checkout() {
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [tid, setTid] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const API = "http://localhost:5000";
 
   const paymentDetails = {
     jazzcash: { title: "JazzCash", account: "03271744162", holder: "Muhamad Khuzaima Nadeem", color: "bg-[#F70000]", icon: <Smartphone size={32} /> },

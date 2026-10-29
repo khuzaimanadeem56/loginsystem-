@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { ShoppingCart, CreditCard, X, Trash2, Plus, Minus, MapPin, CheckCircle2, Wallet } from "lucide-react";
+import { API_URL as API } from "../config/api";
 
 function Cart() {
   const [cart, setCart] = useState([]);
@@ -13,8 +14,6 @@ function Cart() {
   const [tid, setTid] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const API = "http://localhost:5000";
-
   useEffect(() => {
     const c = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(c);

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
+import { API_URL as API } from "../config/api";
 
 function AdminHelp() {
   const [threads, setThreads] = useState([]);
   const [selected, setSelected] = useState(null);
   const [messages, setMessages] = useState([]);
   const [reply, setReply] = useState("");
-  const API = 'http://localhost:5000';
   const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {

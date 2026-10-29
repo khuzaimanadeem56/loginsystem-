@@ -5,16 +5,16 @@ import Sidebar from "../components/Sidebar";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Phone, User as UserIcon, Info, Search, Trash2, Edit3, ShieldCheck } from "lucide-react";
 import Swal from "sweetalert2"; // For beautiful alerts (npm install sweetalert2)
+import { API_URL as API } from "../config/api";
 
 function AllUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const currentUser = JSON.parse(localStorage.getItem("user"));
-
   const fetchUsers = () => {
     setLoading(true);
-    fetch("http://localhost:5000/auth/users")
+    fetch(`${API}/auth/users`)
       .then((res) => res.json())
       .then((data) => {
         setUsers(data);
@@ -56,7 +56,7 @@ function AllUsers() {
 
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:5000/auth/users/${id}`, {
+        const response = await fetch(`${API}/auth/users/${id}`, {
           method: 'DELETE',
         });
         if (response.ok) {
@@ -154,7 +154,6 @@ const UserCard = ({ u, index, onDelete }) => {
             {/* Image logic: use multer-stored filename from DB (u.image) or fallback to u.profilePic */}
             { (u.image || u.profilePic) ? (
                (() => {
-                 const API = "http://localhost:5000";
                  const imgVal = u.image || u.profilePic;
                  let src = null;
                  if (typeof imgVal === 'string') {

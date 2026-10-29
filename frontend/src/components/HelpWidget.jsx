@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Mail, MessageCircle, HelpCircle, Send, X, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { API_URL as API } from "../config/api";
 
 function HelpWidget() {
   const [open, setOpen] = useState(false);
@@ -9,7 +10,6 @@ function HelpWidget() {
   const [text, setText] = useState('');
   
   const user = JSON.parse(localStorage.getItem('user')) || { email: 'guest', name: 'Guest' };
-  const API = 'http://localhost:5000';
   const pollRef = useRef(null);
   const chatEndRef = useRef(null);
 

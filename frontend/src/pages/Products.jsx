@@ -4,12 +4,12 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { Search, ShoppingCart, Minus, Plus, Tag } from "lucide-react";
 import { motion } from "framer-motion";
+import { API_URL as API } from "../config/api";
 
 function Products() {
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
   const [qty, setQty] = useState({});
-  const API = "http://localhost:5000";
   const navigate = useNavigate();
 
   useEffect(() => {

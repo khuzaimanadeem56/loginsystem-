@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { motion, AnimatePresence } from "framer-motion";
 import { Package, Plus, Search, Image as ImageIcon, X, Edit, Trash2, Minus } from "lucide-react";
+import { API_URL as API } from "../config/api";
 
 function AddInventory() {
   const [showModal, setShowModal] = useState(false);
@@ -17,8 +18,6 @@ function AddInventory() {
   const [qty, setQty] = useState({});
   const [search, setSearch] = useState("");
   const [editingId, setEditingId] = useState(null);
-  const API = "http://localhost:5000";
-
   useEffect(() => {
     fetch(`${API}/inventory`)
       .then((r) => r.json())

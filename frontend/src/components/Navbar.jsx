@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaSearch, FaBell, FaCog, FaStar } from "react-icons/fa";
 import { Menu } from "lucide-react";
+import { API_URL } from "../config/api";
 
 function Navbar({ user }) {
   const [open, setOpen] = useState(false);
@@ -17,7 +18,6 @@ function Navbar({ user }) {
   const navigate = useNavigate();
   const location = useLocation();
   const isAdmin = user?.email === "khuzi56@gmail.com";
-
   useEffect(() => {
     // apply theme class to body
     if (theme === 'light') {
@@ -124,7 +124,7 @@ function Navbar({ user }) {
     try {
       if (fetchController.current) fetchController.current.abort();
       fetchController.current = new AbortController();
-      const res = await fetch('http://localhost:5000/inventory', { signal: fetchController.current.signal });
+      const res = await fetch(`${API_URL}/inventory`, { signal: fetchController.current.signal });
       const items = await res.json();
       const filtered = items
         .filter(it => {
@@ -193,7 +193,7 @@ function Navbar({ user }) {
   };
 
   const imageUrl = user?.image
-    ? `http://localhost:5000/uploads/${user.image}`
+    ? `${API_URL}/uploads/${user.image}`
     : null;
 
   const firstLetter = user?.name?.charAt(0).toUpperCase();

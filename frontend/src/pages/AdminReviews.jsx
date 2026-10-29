@@ -3,12 +3,12 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Trash2, UserCircle, MessageSquareQuote, Loader2 } from "lucide-react";
+import { API_URL as API } from "../config/api";
 
 function AdminReviews() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true); // 👈 Loading state add ki
   const user = JSON.parse(localStorage.getItem("user"));
-
   useEffect(() => {
     if (!user || user.email !== "khuzi56@gmail.com") {
       window.location.href = "/dashboard";
@@ -20,7 +20,7 @@ function AdminReviews() {
   const fetchReviews = async () => {
     try {
       setLoading(true); // Fetch shuru hone se pehle loading true
-      const res = await fetch("http://localhost:5000/reviews");
+      const res = await fetch(`${API}/reviews`);
       const data = await res.json();
       
       const userIds = [...new Set(data.map((r) => r.userId).filter(Boolean))];
@@ -29,7 +29,7 @@ function AdminReviews() {
       await Promise.all(
         userIds.map(async (id) => {
           try {
-            const uRes = await fetch(`http://localhost:5000/auth/profile/${id}`);
+            const uRes = await fetch(`${API}/auth/profile/${id}`);
             if (!uRes.ok) return;
             const u = await uRes.json();
             usersMap[id] = u;
@@ -39,7 +39,7 @@ function AdminReviews() {
 
       const merged = data.map((r) => ({
         ...r,
-        userImage: r.userId && usersMap[r.userId] ? `http://localhost:5000/uploads/${usersMap[r.userId].image}` : null,
+        userImage: r.userId && usersMap[r.userId] ? `${API}/uploads/${usersMap[r.userId].image}` : null,
         userName: r.name || (r.userId && usersMap[r.userId] ? usersMap[r.userId].name : "User"),
       }));
 
@@ -54,7 +54,7 @@ function AdminReviews() {
   const deleteReview = async (id) => {
     const ok = window.confirm("Delete this review?");
     if (!ok) return;
-    await fetch(`http://localhost:5000/reviews/${id}`, { method: "DELETE" });
+    await fetch(`${API}/reviews/${id}`, { method: "DELETE" });
     setReviews(reviews.filter((r) => r._id !== id));
   };
 

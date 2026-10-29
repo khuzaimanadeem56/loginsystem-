@@ -15,6 +15,7 @@ import {
   Zap
 } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
+import { API_URL } from "../config/api";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -32,7 +33,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/auth/login", {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

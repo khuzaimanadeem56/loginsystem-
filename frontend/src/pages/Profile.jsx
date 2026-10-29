@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { User, Camera, X, Check, Mail, Phone, ShieldCheck, Globe, Cpu, Edit3, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { API_URL as API } from "../config/api";
 
 function Profile() {
   const stored = JSON.parse(localStorage.getItem("user") || "null");
@@ -10,10 +11,9 @@ function Profile() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({});
   const [image, setImage] = useState(null);
-
   useEffect(() => {
     if (!stored || !stored._id) return;
-    fetch(`http://localhost:5000/auth/profile/${stored._id}`)
+    fetch(`${API}/auth/profile/${stored._id}`)
       .then((res) => res.json())
       .then((data) => {
         setUser(data);
@@ -30,7 +30,7 @@ function Profile() {
     fd.append("phone", form.phone || "");
     if (image) fd.append("image", image);
 
-    const res = await fetch(`http://localhost:5000/auth/profile/${user._id}`, {
+    const res = await fetch(`${API}/auth/profile/${user._id}`, {
       method: "PUT",
       body: fd,
     });
@@ -97,7 +97,7 @@ function Profile() {
                 <div className="relative p-2 rounded-full border border-cyan-500/30">
                   <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-white shadow-[0_0_30px_rgba(255,255,255,0.1)]">
                     {user.image ? (
-                      <img src={`http://localhost:5000/uploads/${user.image}`} className="w-full h-full object-cover" alt="Profile" />
+                      <img src={`${API}/uploads/${user.image}`} className="w-full h-full object-cover" alt="Profile" />
                     ) : (
                       <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-400"><User size={48} /></div>
                     )}
@@ -174,7 +174,7 @@ function Profile() {
                     <div className="md:col-span-4 flex flex-col items-center space-y-4">
                       <div className="relative group cursor-pointer">
                         <div className="w-32 h-32 rounded-3xl overflow-hidden border-2 border-white/10 group-hover:border-cyan-500 transition-all">
-                          <img src={image ? URL.createObjectURL(image) : user.image ? `http://localhost:5000/uploads/${user.image}` : ""} className="w-full h-full object-cover" alt="Preview" />
+                          <img src={image ? URL.createObjectURL(image) : user.image ? `${API}/uploads/${user.image}` : ""} className="w-full h-full object-cover" alt="Preview" />
                         </div>
                         <label className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl">
                           <Camera className="text-white" size={24} />
