@@ -68,16 +68,27 @@ function Register() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
-      const data = await res.json();
 
-      if (res.ok) {
+      let data = null;
+      try {
+        data = await res.json();
+      } catch (parseErr) {
+        data = { message: `Server error (${res.status})` };
+      }
+
+      if (res.ok && data) {
         setSuccess(true);
         setTimeout(() => navigate("/"), 2000);
       } else {
-        setError(data.message || "Registration failed. Please try again.");
+        setError(data?.message || "Registration failed. Please try again.");
       }
     } catch (err) {
-      setError("Unable to connect to server. Please verify backend is running.");
+      console.error("Register request error:", err);
+      setError(
+        err?.message && !err.message.includes("fetch") && !err.message.includes("Failed")
+          ? err.message
+          : "Unable to connect to server. Please verify backend is running and CORS/network settings allow access."
+      );
     } finally {
       setLoading(false);
     }
