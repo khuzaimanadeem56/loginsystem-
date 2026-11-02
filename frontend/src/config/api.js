@@ -59,3 +59,20 @@ export const getApiUrl = (endpoint = "") => {
 
   return `${base}${cleanEndpoint}`;
 };
+
+// Safe helper to resolve image URLs across Cloudinary (https://), Data URIs, and legacy /uploads paths
+export const getImageUrl = (imagePath) => {
+  if (!imagePath || typeof imagePath !== "string") return "";
+  const trimmed = imagePath.trim();
+  if (
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("data:") ||
+    trimmed.startsWith("blob:")
+  ) {
+    return trimmed;
+  }
+  const cleanPath = trimmed.startsWith("/") ? trimmed : `/uploads/${trimmed}`;
+  const base = (API_URL || "").replace(/\/+$/, "");
+  return `${base}${cleanPath}`;
+};

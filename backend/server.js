@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import mongoose from "mongoose";
 import connectDB, { isDbConnected } from "./config/db.js";
@@ -125,8 +126,14 @@ const mountRoutes = (path, router) => {
 };
 
 mountRoutes("/auth", authRoutes);
-app.use("/uploads", express.static("uploads"));
-app.use("/api/uploads", express.static("uploads"));
+
+// Safely mount legacy local uploads if directory exists (for local development or pre-existing files)
+const localUploadsDir = path.resolve(__dirname, "uploads");
+if (fs.existsSync(localUploadsDir)) {
+  app.use("/uploads", express.static(localUploadsDir));
+  app.use("/api/uploads", express.static(localUploadsDir));
+}
+
 mountRoutes("/reviews", reviewRoutes);
 mountRoutes("/inventory", inventoryRoutes);
 mountRoutes("/orders", orderRoutes);

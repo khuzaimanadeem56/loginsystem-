@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import connectDB, { isDbConnected } from "../config/db.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../config/cloudinary.js";
 
 // Safe JWT Secret reader with fallback
 const getJwtSecret = () => {
@@ -200,24 +201,50 @@ export const getProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     if (!isDbConnected()) await connectDB();
-    const { name, gender, bio, phone } = req.body;
-    const updateData = { name, gender, bio, phone };
+    const { name, gender, bio, phone } = req.body || {};
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (gender !== undefined) updateData.gender = gender;
+    if (bio !== undefined) updateData.bio = bio;
+    if (phone !== undefined) updateData.phone = phone;
 
     if (req.file) {
-      updateData.image = req.file.filename;
+      const uploadResult = await uploadToCloudinary(req.file.buffer, {
+        folder: "profiles",
+        filename: req.file.originalname,
+        mimetype: req.file.mimetype,
+      });
+
+      // Cleanup prior Cloudinary image if it exists
+      try {
+        const existingUser = await User.findById(req.params.id);
+        if (existingUser?.image && existingUser.image.includes("cloudinary.com")) {
+          deleteFromCloudinary(existingUser.image).catch(() => {});
+        }
+      } catch {
+        // Non-fatal
+      }
+
+      updateData.image = uploadResult.secure_url || uploadResult.url;
     }
 
     const user = await User.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
     });
 
-    res.json({
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    return res.json({
       message: "Profile updated successfully",
       user,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message });
+    console.error("[Update Profile Error]:", error);
+    return res.status(500).json({
+      message: error.message || "Failed to update profile.",
+    });
   }
 };
 

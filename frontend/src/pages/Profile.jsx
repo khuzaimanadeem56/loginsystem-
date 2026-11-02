@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { User, Camera, X, Check, Mail, Phone, ShieldCheck, Globe, Cpu, Edit3, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { API_URL as API } from "../config/api";
+import { API_URL as API, getImageUrl } from "../config/api";
 
 function Profile() {
   const stored = JSON.parse(localStorage.getItem("user") || "null");
@@ -11,6 +11,7 @@ function Profile() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({});
   const [image, setImage] = useState(null);
+
   useEffect(() => {
     if (!stored || !stored._id) return;
     fetch(`${API}/auth/profile/${stored._id}`)
@@ -60,7 +61,7 @@ function Profile() {
         <Navbar user={user} />
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-12 custom-scrollbar relative z-10">
-          
+
           {/* Top Hero Section */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
             <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
@@ -84,20 +85,20 @@ function Profile() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
+
             {/* 1. Main ID Card (Bento Style) */}
-            <motion.div 
+            <motion.div
               initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
               className="lg:col-span-4 bg-white/[0.03] border border-white/10 rounded-[2.5rem] p-8 backdrop-blur-md relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity">
-                 <Cpu className="text-cyan-500" size={40} />
+                <Cpu className="text-cyan-500" size={40} />
               </div>
               <div className="flex flex-col items-center">
                 <div className="relative p-2 rounded-full border border-cyan-500/30">
                   <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-white shadow-[0_0_30px_rgba(255,255,255,0.1)]">
                     {user.image ? (
-                      <img src={`${API}/uploads/${user.image}`} className="w-full h-full object-cover" alt="Profile" />
+                      <img src={getImageUrl(user.image)} className="w-full h-full object-cover" alt="Profile" />
                     ) : (
                       <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-400"><User size={48} /></div>
                     )}
@@ -107,7 +108,7 @@ function Profile() {
                 <span className="mt-2 px-4 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-black uppercase tracking-widest text-cyan-500">
                   Core User Node
                 </span>
-                
+
                 <div className="w-full mt-10 space-y-3">
                   <DetailLine label="NODE ID" value={user._id.slice(-8).toUpperCase()} />
                   <DetailLine label="SYSTEM MAIL" value={user.email} />
@@ -116,26 +117,26 @@ function Profile() {
             </motion.div>
 
             {/* 2. Detailed Specs (Bento Style) */}
-            <motion.div 
+            <motion.div
               initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}
               className="lg:col-span-8 bg-white/[0.03] border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-md"
             >
               <h3 className="text-[10px] font-black tracking-[0.4em] uppercase text-cyan-500 mb-8 flex items-center gap-2">
-                <ShieldCheck size={14}/> Authentication Metadata
+                <ShieldCheck size={14} /> Authentication Metadata
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <SpecItem icon={<Mail className="text-slate-500"/>} label="Primary Contact" value={user.email} />
-                <SpecItem icon={<Phone className="text-slate-500"/>} label="Secure Line" value={user.phone || "UNSET"} />
-                <SpecItem icon={<Globe className="text-slate-500"/>} label="Gender Spec" value={user.gender || "UNSET"} />
-                <SpecItem icon={<Check className="text-emerald-500"/>} label="Account Status" value="SECURE" />
+                <SpecItem icon={<Mail className="text-slate-500" />} label="Primary Contact" value={user.email} />
+                <SpecItem icon={<Phone className="text-slate-500" />} label="Secure Line" value={user.phone || "UNSET"} />
+                <SpecItem icon={<Globe className="text-slate-500" />} label="Gender Spec" value={user.gender || "UNSET"} />
+                <SpecItem icon={<Check className="text-emerald-500" />} label="Account Status" value="SECURE" />
               </div>
 
               <div className="mt-12 p-6 rounded-3xl bg-black/40 border border-white/5 relative">
-                 <div className="absolute -top-3 left-6 px-3 bg-[#020617] text-[9px] font-black tracking-widest text-slate-500">BIOGRAPHY MODULE</div>
-                 <p className="text-sm italic text-slate-400 leading-relaxed">
-                   {user.bio || "The user has not yet initialized a professional biography sequence."}
-                 </p>
+                <div className="absolute -top-3 left-6 px-3 bg-[#020617] text-[9px] font-black tracking-widest text-slate-500">BIOGRAPHY MODULE</div>
+                <p className="text-sm italic text-slate-400 leading-relaxed">
+                  {user.bio || "The user has not yet initialized a professional biography sequence."}
+                </p>
               </div>
             </motion.div>
 
@@ -146,13 +147,13 @@ function Profile() {
         <AnimatePresence>
           {open && (
             <div className="fixed inset-0 flex items-center justify-center z-[100] p-4">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 onClick={() => setOpen(false)}
-                className="absolute inset-0 bg-black/90 backdrop-blur-xl" 
+                className="absolute inset-0 bg-black/90 backdrop-blur-xl"
               />
-              
-              <motion.div 
+
+              <motion.div
                 initial={{ rotateX: 20, y: 50, opacity: 0 }}
                 animate={{ rotateX: 0, y: 0, opacity: 1 }}
                 exit={{ rotateX: 20, y: 50, opacity: 0 }}
@@ -165,7 +166,7 @@ function Profile() {
                       <p className="text-[10px] font-bold text-slate-500 tracking-widest uppercase mt-1 italic">Rewrite your digital history</p>
                     </div>
                     <button onClick={() => setOpen(false)} className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white transition-all">
-                      <X size={20}/>
+                      <X size={20} />
                     </button>
                   </div>
 
@@ -174,7 +175,7 @@ function Profile() {
                     <div className="md:col-span-4 flex flex-col items-center space-y-4">
                       <div className="relative group cursor-pointer">
                         <div className="w-32 h-32 rounded-3xl overflow-hidden border-2 border-white/10 group-hover:border-cyan-500 transition-all">
-                          <img src={image ? URL.createObjectURL(image) : user.image ? `${API}/uploads/${user.image}` : ""} className="w-full h-full object-cover" alt="Preview" />
+                          <img src={image ? URL.createObjectURL(image) : user.image ? getImageUrl(user.image) : ""} className="w-full h-full object-cover" alt="Preview" />
                         </div>
                         <label className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl">
                           <Camera className="text-white" size={24} />
@@ -186,20 +187,20 @@ function Profile() {
 
                     {/* Right: Form Inputs */}
                     <div className="md:col-span-8 space-y-5">
-                      <CyberInput label="Name" value={form.name} onChange={(v) => setForm({...form, name: v})} />
+                      <CyberInput label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <CyberInput label="Phone |Number" value={form.phone} onChange={(v) => setForm({...form, phone: v})} type="number" />
+                        <CyberInput label="Phone |Number" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} type="number" />
                         <div className="space-y-2">
-                           <p className="text-[9px] font-black text-cyan-500 uppercase tracking-widest ml-1 italic">Gender</p>
-                           <select className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-cyan-500 appearance-none" value={form.gender || ""} onChange={(e) => setForm({...form, gender: e.target.value})}>
-                              <option className="bg-black">Male</option>
-                              <option className="bg-black">Female</option>
-                           </select>
+                          <p className="text-[9px] font-black text-cyan-500 uppercase tracking-widest ml-1 italic">Gender</p>
+                          <select className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-cyan-500 appearance-none" value={form.gender || ""} onChange={(e) => setForm({ ...form, gender: e.target.value })}>
+                            <option className="bg-black">Male</option>
+                            <option className="bg-black">Female</option>
+                          </select>
                         </div>
                       </div>
                       <div className="space-y-2">
                         <p className="text-[9px] font-black text-cyan-500 uppercase tracking-widest ml-1 italic">Bio</p>
-                        <textarea className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none focus:border-cyan-500 resize-none h-24" value={form.bio || ""} onChange={(e) => setForm({...form, bio: e.target.value})} placeholder="Input neural bio data..." />
+                        <textarea className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none focus:border-cyan-500 resize-none h-24" value={form.bio || ""} onChange={(e) => setForm({ ...form, bio: e.target.value })} placeholder="Input neural bio data..." />
                       </div>
                     </div>
                   </div>
@@ -240,7 +241,7 @@ const SpecItem = ({ icon, label, value }) => (
 const CyberInput = ({ label, value, onChange, type = "text" }) => (
   <div className="space-y-2">
     <p className="text-[9px] font-black text-cyan-500 uppercase tracking-widest ml-1 italic">{label}</p>
-    <input 
+    <input
       type={type} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-cyan-500 transition-all shadow-inner"
       value={value || ""} onChange={(e) => onChange(e.target.value)}
     />

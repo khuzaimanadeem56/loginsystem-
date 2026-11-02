@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaSearch, FaBell, FaCog, FaStar } from "react-icons/fa";
 import { Menu } from "lucide-react";
-import { API_URL } from "../config/api";
+import { API_URL, getImageUrl } from "../config/api";
 
 function Navbar({ user }) {
   const [open, setOpen] = useState(false);
@@ -192,9 +192,7 @@ function Navbar({ user }) {
     }
   };
 
-  const imageUrl = user?.image
-    ? `${API_URL}/uploads/${user.image}`
-    : null;
+  const imageUrl = user?.image ? getImageUrl(user.image) : null;
 
   const firstLetter = user?.name?.charAt(0).toUpperCase();
 
