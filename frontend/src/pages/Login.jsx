@@ -70,12 +70,7 @@ function Login() {
     } finally {
       setLoading(false);
     }
-  } catch (err) {
-    setError("Unable to connect to server. Please ensure the backend is running.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
 return (
   // Desktop par zero scrolling (md:h-screen md:overflow-hidden), mobile par smooth responsive flow
