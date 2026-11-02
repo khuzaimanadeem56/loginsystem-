@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    name: String,
-    email: { type: String, required: true },
-    password: String,
+    name: { type: String, trim: true },
+    email: { type: String, required: true, trim: true, lowercase: true },
+    password: { type: String, required: true },
 
     role: {
       type: String,
@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema(
     phone: String,
     image: String,
   },
-  { collection: "users" }
+  { collection: "users", timestamps: true }
 );
 
 export default mongoose.model("User", userSchema);

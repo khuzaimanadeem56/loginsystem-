@@ -108,7 +108,13 @@ app.get(["/health", "/api/health"], (_req, res) => {
     ok: true,
     status: "healthy",
     database: isDbConnected() ? "connected" : "disconnected",
-    hasMongoUri: Boolean(process.env.MONGO_URI),
+    hasMongoUri: Boolean(
+      process.env.MONGO_URI ||
+      process.env.MONGODB_URI ||
+      process.env.MONGO_URL ||
+      process.env.DATABASE_URL
+    ),
+    hasJwtSecret: Boolean(process.env.JWT_SECRET || process.env.JWT_KEY),
   });
 });
 

@@ -15,6 +15,14 @@ import {
   Zap
 } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
+import { API_URL, getApiUrl } from "../config/api";
+
+// Safe API URL resolution fallback
+const resolvedApiUrl =
+  (typeof API_URL !== "undefined" && API_URL) ||
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.NEXT_PUBLIC_API_URL ||
+  (import.meta.env.PROD ? "/api" : "http://localhost:5000");
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -32,7 +40,12 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/auth/login`, {
+      const endpoint =
+        typeof getApiUrl === "function"
+          ? getApiUrl("/auth/login")
+          : `${resolvedApiUrl}/auth/login`;
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -46,6 +59,9 @@ function Login() {
       }
 
       if (res.ok && data) {
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
         const loggedUser = {
           ...data.user,
           role: data.user?.email === "khuzi56@gmail.com" ? "admin" : "user",

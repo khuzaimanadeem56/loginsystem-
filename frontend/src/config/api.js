@@ -48,8 +48,14 @@ export const API_URL = import.meta.env?.PROD
   ? (cleaned && !isLocalhost ? cleaned : "/api")
   : (cleaned || "http://localhost:5000");
 
-// Safe helper to construct endpoint URLs
+// Safe helper to construct endpoint URLs without duplicate /api prefixes
 export const getApiUrl = (endpoint = "") => {
-  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  return `${API_URL}${cleanEndpoint}`;
+  const base = (API_URL || "").replace(/\/+$/, "");
+  let cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+
+  if (base.endsWith("/api") && cleanEndpoint.startsWith("/api/")) {
+    cleanEndpoint = cleanEndpoint.replace(/^\/api/, "");
+  }
+
+  return `${base}${cleanEndpoint}`;
 };

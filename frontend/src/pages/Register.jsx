@@ -19,7 +19,14 @@ import {
   Layers
 } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import { API_URL } from "../config/api";
+import { API_URL, getApiUrl } from "../config/api";
+
+// Safe API URL resolution fallback
+const resolvedApiUrl =
+  (typeof API_URL !== "undefined" && API_URL) ||
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.NEXT_PUBLIC_API_URL ||
+  (import.meta.env.PROD ? "/api" : "http://localhost:5000");
 
 function Register() {
   const [name, setName] = useState("");
@@ -63,7 +70,12 @@ function Register() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/auth/register`, {
+      const endpoint =
+        typeof getApiUrl === "function"
+          ? getApiUrl("/auth/register")
+          : `${resolvedApiUrl}/auth/register`;
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
@@ -77,6 +89,9 @@ function Register() {
       }
 
       if (res.ok && data) {
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
         setSuccess(true);
         setTimeout(() => navigate("/"), 2000);
       } else {

@@ -10,9 +10,20 @@ const connectDB = async () => {
     return mongoose.connection;
   }
 
-  const uri = process.env.MONGO_URI;
+  // If currently connecting, wait for the existing connection to settle
+  if (mongoose.connection.readyState === 2 && cachedConnectionPromise) {
+    return await cachedConnectionPromise;
+  }
+
+  const uri =
+    process.env.MONGO_URI ||
+    process.env.MONGODB_URI ||
+    process.env.MONGO_URL ||
+    process.env.DATABASE_URL;
+
   if (!uri) {
-    const errorMsg = "CRITICAL: MONGO_URI is missing from process.env! Please add MONGO_URI in your Vercel/production Environment Variables.";
+    const errorMsg =
+      "CRITICAL: MONGO_URI is missing from process.env! Please add MONGO_URI in your Vercel/production Environment Variables.";
     console.error(`[Database Error] ${errorMsg}`);
     throw new Error(errorMsg);
   }

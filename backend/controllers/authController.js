@@ -1,46 +1,143 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import connectDB, { isDbConnected } from "../config/db.js";
 
+// Safe JWT Secret reader with fallback
+const getJwtSecret = () => {
+  return (
+    process.env.JWT_SECRET ||
+    process.env.JWT_KEY ||
+    "antigravity_jwt_secret_fallback_key_2026"
+  );
+};
+
+// Generate JWT Helper
+const generateToken = (userId, role) => {
+  return jwt.sign(
+    { id: userId, role: role || "user" },
+    getJwtSecret(),
+    { expiresIn: "30d" }
+  );
+};
+
+// ==========================================
+// REGISTER USER
+// ==========================================
 export const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password } = req.body || {};
 
   try {
-    const exist = await User.findOne({ email });
-    if (exist) {
-      return res.status(400).json({ message: "User already exists" });
+    // 1. Ensure DB connection is active
+    if (!isDbConnected()) {
+      await connectDB();
     }
 
+    // 2. Validate inputs
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required.",
+      });
+    }
+
+    if (typeof password !== "string" || password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters long.",
+      });
+    }
+
+    const cleanEmail = String(email).trim().toLowerCase();
+    const cleanName = name ? String(name).trim() : cleanEmail.split("@")[0];
+
+    // 3. Check for existing user
+    const exist = await User.findOne({ email: cleanEmail });
+    if (exist) {
+      return res.status(400).json({
+        message: "User with this email already exists.",
+      });
+    }
+
+    // 4. Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+    const role = cleanEmail === "khuzi56@gmail.com" ? "admin" : "user";
 
-    const role = email === "khuzi56@gmail.com" ? "admin" : "user";
-
+    // 5. Create user in DB
     const user = await User.create({
-      name,
-      email,
+      name: cleanName,
+      email: cleanEmail,
       password: hashedPassword,
-      role
+      role,
     });
 
-    res.status(201).json({
+    // 6. Generate token
+    const token = generateToken(user._id, user.role);
+
+    return res.status(201).json({
       message: "Registered successfully",
+      token,
       user: {
         _id: user._id,
         name: user.name || "User",
         email: user.email,
         role: user.role,
-      }
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("[Register Error]:", error);
+
+    // MongoDB duplicate key error code
+    if (error.code === 11000) {
+      return res.status(400).json({
+        message: "An account with this email already exists.",
+      });
+    }
+
+    // Mongoose validation error
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        message: Object.values(error.errors).map((e) => e.message).join(", "),
+      });
+    }
+
+    // Database connection issues
+    if (
+      error.name === "MongoServerSelectionError" ||
+      error.name === "MongoNetworkError" ||
+      error.message?.includes("buffering timed out")
+    ) {
+      return res.status(503).json({
+        message:
+          "Database connection error. Please verify MongoDB Atlas Network Access whitelist (0.0.0.0/0) and MONGO_URI.",
+      });
+    }
+
+    return res.status(500).json({
+      message: error.message || "Internal server error during registration.",
+    });
   }
 };
 
-
+// ==========================================
+// LOGIN USER
+// ==========================================
 export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body || {};
 
   try {
-    const user = await User.findOne({ email });
+    // 1. Ensure DB connection is active
+    if (!isDbConnected()) {
+      await connectDB();
+    }
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required.",
+      });
+    }
+
+    const cleanEmail = String(email).trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
+
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -50,61 +147,86 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // ✅ SIRF RESPONSE
-res.status(200).json({
-  message: "Login successful",
-  user: {
-    _id: user._id,
-    name: user.name || "User",
-    email: user.email,
-    gender: user.gender || "",
-    image: user.image || ""
-  }
-});
+    const token = generateToken(user._id, user.role);
 
-
-
+    return res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        _id: user._id,
+        name: user.name || "User",
+        email: user.email,
+        role: user.role || (user.email === "khuzi56@gmail.com" ? "admin" : "user"),
+        gender: user.gender || "",
+        image: user.image || "",
+      },
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+    console.error("[Login Error]:", error);
 
-
-// GET PROFILE
-export const getProfile = async (req, res) => {
-  const user = await User.findById(req.params.id);
-  res.json(user);
-};
-
-// UPDATE PROFILE
-export const updateProfile = async (req, res) => {
-  try {
-    const { name, gender, bio, phone } = req.body; // ✅ phone bhi include
-
-    const updateData = { name, gender, bio, phone }; // ✅ phone update me
-
-    if (req.file) {
-      updateData.image = req.file.filename; // image upload handle
+    if (
+      error.name === "MongoServerSelectionError" ||
+      error.name === "MongoNetworkError" ||
+      error.message?.includes("buffering timed out")
+    ) {
+      return res.status(503).json({
+        message:
+          "Database connection error. Please verify MongoDB Atlas Network Access whitelist (0.0.0.0/0) and MONGO_URI.",
+      });
     }
 
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    );
+    return res.status(500).json({
+      message: error.message || "Internal server error during login.",
+    });
+  }
+};
+
+// ==========================================
+// GET PROFILE
+// ==========================================
+export const getProfile = async (req, res) => {
+  try {
+    if (!isDbConnected()) await connectDB();
+    const user = await User.findById(req.params.id);
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ==========================================
+// UPDATE PROFILE
+// ==========================================
+export const updateProfile = async (req, res) => {
+  try {
+    if (!isDbConnected()) await connectDB();
+    const { name, gender, bio, phone } = req.body;
+    const updateData = { name, gender, bio, phone };
+
+    if (req.file) {
+      updateData.image = req.file.filename;
+    }
+
+    const user = await User.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+    });
 
     res.json({
       message: "Profile updated successfully",
-      user
+      user,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
   }
 };
-// 👇 YEH FUNCTION MUST HO
+
+// ==========================================
+// ADMIN: GET ALL USERS
+// ==========================================
 export const getAllUsers = async (req, res) => {
   try {
+    if (!isDbConnected()) await connectDB();
     const users = await User.find();
     res.json(users);
   } catch (err) {
@@ -112,10 +234,12 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-// ADMIN – UPDATE USER
-// ✅ ADMIN – UPDATE USER
+// ==========================================
+// ADMIN: UPDATE USER
+// ==========================================
 export const adminUpdateUser = async (req, res) => {
   try {
+    if (!isDbConnected()) await connectDB();
     const { name, email, phone, gender, bio } = req.body;
 
     const user = await User.findByIdAndUpdate(
@@ -126,25 +250,25 @@ export const adminUpdateUser = async (req, res) => {
 
     res.json({
       message: "User updated by admin",
-      user
+      user,
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// ✅ ADMIN – DELETE USER
+// ==========================================
+// ADMIN: DELETE USER
+// ==========================================
 export const deleteUser = async (req, res) => {
   try {
+    if (!isDbConnected()) await connectDB();
     await User.findByIdAndDelete(req.params.id);
 
     res.json({
-      message: "User deleted successfully"
+      message: "User deleted successfully",
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-
-
-

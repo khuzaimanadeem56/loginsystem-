@@ -3,7 +3,6 @@ import { jsPDF } from "jspdf";
 import { motion } from "framer-motion";
 import { CheckCircle2, Download, ArrowRight, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
-import { API_URL } from "../config/api";
 
 function Success() {
   const { state } = useLocation();
@@ -22,9 +21,35 @@ function Success() {
         try {
           setLoading(true);
           console.log('[Success] session_id detected:', sessionId);
-          const res = await fetch(`${API_URL}/stripe/session/${encodeURIComponent(sessionId)}`);
-          console.log('[Success] session fetch ok?', res.ok);
-          if (!res.ok) {
+          // Try relative first (works if proxy configured), otherwise try backend host
+                    const backendBase = import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+          const tried = [];
+          let res;
+          try {
+            const relUrl = `/stripe/session/${encodeURIComponent(sessionId)}`;
+            tried.push(relUrl);
+            res = await fetch(relUrl);
+            if (!res.ok) {
+              res = null;
+            }
+          } catch (e) {
+            console.warn('[Success] relative fetch failed', e);
+            res = null;
+          }
+
+          if (!res) {
+            try {
+              const abs = `${backendBase}/stripe/session/${encodeURIComponent(sessionId)}`;
+              tried.push(abs);
+              res = await fetch(abs);
+            } catch (e) {
+              console.warn('[Success] backend fetch failed', e);
+              res = null;
+            }
+          }
+
+          console.log('[Success] fetch attempts:', tried, 'response ok?', !!res && res.ok);
+          if (!res || !res.ok) {
             throw new Error('Session fetch failed');
           }
 
@@ -34,16 +59,28 @@ function Success() {
           // Try to mark pending orders Approved for local testing (if webhook not configured)
           (async () => {
             try {
-              const markRes = await fetch(
-                `${API_URL}/stripe/debug/mark-approved/${encodeURIComponent(sessionId)}`,
-                { method: 'POST' }
-              );
-              console.log('[Success] mark-approved ok?', markRes.ok);
+                            const backendBase = import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+              const triedMark = [];
+              let markRes = null;
+              try {
+                const relMark = `/stripe/debug/mark-approved/${encodeURIComponent(sessionId)}`;
+                triedMark.push(relMark);
+                markRes = await fetch(relMark, { method: 'POST' });
+                if (!markRes.ok) markRes = null;
+              } catch (e) { markRes = null; }
+              if (!markRes) {
+                try {
+                  const absMark = `${backendBase}/stripe/debug/mark-approved/${encodeURIComponent(sessionId)}`;
+                  triedMark.push(absMark);
+                  markRes = await fetch(absMark, { method: 'POST' });
+                } catch (e) { markRes = null; }
+              }
+              console.log('[Success] mark-approved attempts:', triedMark, 'ok?', !!markRes && markRes.ok);
             } catch (e) {
               console.warn('[Success] mark-approved failed', e);
             }
           })();
-          try { localStorage.removeItem('pending_checkout'); } catch {}
+          try { localStorage.removeItem('pending_checkout'); } catch { }
         } catch (err) {
           console.error('Failed to load stripe session', err);
           // Fallback: try pending_checkout from localStorage
@@ -52,7 +89,7 @@ function Success() {
             console.log('[Success] pending_checkout fallback:', pending);
             if (pending && pending.items) {
               setPayload(pending);
-              try { localStorage.removeItem('pending_checkout'); } catch {}
+              try { localStorage.removeItem('pending_checkout'); } catch { }
             }
           } catch (e) {
             console.warn('[Success] pending_checkout parse failed', e);
@@ -80,16 +117,16 @@ function Success() {
       }
 
       const doc = new jsPDF();
-      
+
       // --- HEADER ---
       doc.setFillColor(15, 23, 42); // Dark Blue / Black
       doc.rect(0, 0, 210, 40, 'F');
-      
+
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(22);
       doc.setFont("helvetica", "bold");
       doc.text("KHUZI XCESSORIES", 20, 25);
-      
+
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
       doc.text("Official Digital Receipt", 20, 33);
@@ -132,7 +169,7 @@ function Success() {
         doc.text(String(itemQty), 122, y);
         doc.text(itemPrice.toLocaleString(), 145, y);
         doc.text(itemTotal.toLocaleString(), 175, y);
-        
+
         // Line under each row
         doc.setDrawColor(240, 240, 240);
         doc.line(20, y + 2, 190, y + 2);
@@ -180,7 +217,7 @@ function Success() {
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-600/10 blur-[120px] rounded-full shadow-2xl" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-600/10 blur-[120px] rounded-full shadow-2xl" />
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         className="relative w-full max-w-md bg-[#0f172a]/70 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
@@ -217,15 +254,15 @@ function Success() {
         </div>
 
         <div className="space-y-3">
-          <button 
-            onClick={() => navigate('/products')} 
+          <button
+            onClick={() => navigate('/products')}
             className="w-full py-4 bg-white text-black rounded-2xl font-black text-xs tracking-widest hover:bg-cyan-400 transition-all flex items-center justify-center gap-2 group active:scale-95 shadow-xl"
           >
             CONTINUE SHOPPING <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </button>
-          
-          <button 
-            onClick={generatePDF} 
+
+          <button
+            onClick={generatePDF}
             className="w-full py-4 bg-gray-800/40 hover:bg-gray-800/60 text-gray-400 hover:text-white rounded-2xl font-bold text-[10px] tracking-widest border border-white/5 transition-all flex items-center justify-center gap-2 active:scale-95 shadow-lg"
           >
             <Download size={14} /> SAVE RECEIPT (PDF)
@@ -233,8 +270,8 @@ function Success() {
         </div>
 
         <div className="mt-8 flex justify-center items-center gap-2 opacity-30 grayscale pointer-events-none">
-            <div className="h-4 w-4 bg-white/20 rounded-full" />
-            <span className="text-[9px] font-bold text-white tracking-[0.2em]">SECURE TRANSACTION GATEWAY</span>
+          <div className="h-4 w-4 bg-white/20 rounded-full" />
+          <span className="text-[9px] font-bold text-white tracking-[0.2em]">SECURE TRANSACTION GATEWAY</span>
         </div>
       </motion.div>
     </div>
