@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { Search, ShoppingCart, Minus, Plus, Tag } from "lucide-react";
 import { motion } from "framer-motion";
-import { API_URL as API } from "../config/api";
+import { API_URL as API, getImageUrl } from "../config/api";
 
 function Products() {
   const [items, setItems] = useState([]);
@@ -91,8 +91,7 @@ function Products() {
                   {/* Image Container */}
                   <div className="relative h-56 bg-[#030712] overflow-hidden">
                     {it.image ? (
-                      <img 
-                        src={`${API}${it.image}`} 
+                      <img src={getImageUrl(it.image)} 
                         alt={it.name} 
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                       />

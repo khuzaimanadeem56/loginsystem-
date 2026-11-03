@@ -1,8 +1,8 @@
-import { useLocation, useNavigate } from "react-router-dom";
+﻿import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, ArrowLeft, ShieldCheck, Smartphone, Landmark, X, Copy, CreditCard } from "lucide-react";
 import { useState, useEffect } from "react";
-import { API_URL as API } from "../config/api";
+import { API_URL as API, getImageUrl } from "../config/api";
 
 function Checkout() {
   const location = useLocation();
@@ -56,7 +56,7 @@ function Checkout() {
       paymentMethod: selectedMethod.title,
       transactionId: tid,
       address: address,
-      // user already provided TID / confirmed payment — mark as approved
+      // user already provided TID / confirmed payment â€” mark as approved
       status: "Approved",
       date: new Date().toISOString()
     };
@@ -147,7 +147,7 @@ function Checkout() {
               
               <div className="flex items-center gap-4 bg-black/20 p-4 rounded-2xl border border-white/5 mb-6">
                 <div className="w-16 h-16 rounded-lg overflow-hidden border border-white/10">
-                   <img src={`${API}${product.image}`} className="w-full h-full object-cover" alt="" />
+                   <img src={getImageUrl(product?.image)} className="w-full h-full object-cover" alt="" />
                 </div>
                 <div>
                   <p className="text-white font-bold text-sm leading-tight">{product.name}</p>

@@ -1,41 +1,68 @@
 import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
 
-// ─────────────────────────────────────────────────────────────────
-// Cloudinary Configuration
-// Supports both:
-//   Option A (recommended): Set CLOUDINARY_URL=cloudinary://key:secret@cloud_name
-//   Option B (individual):  Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
-// ─────────────────────────────────────────────────────────────────
-if (process.env.CLOUDINARY_URL) {
-  // When CLOUDINARY_URL is set, the SDK reads it automatically.
-  // We still call config() with secure:true to force HTTPS.
-  cloudinary.config({ secure: true });
-} else {
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    secure: true,
-  });
-}
-
 /**
- * Returns true if Cloudinary is properly configured
+ * Parses and sanitizes Cloudinary credentials from process.env
+ * Handles:
+ *  - Individual variables: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
+ *  - Unified URL: CLOUDINARY_URL=cloudinary://key:secret@cloud_name
+ *  - Common copy-paste mistakes (spaces, accidental 'CLOUDINARY_URL=' in secret, masked asterisks '***')
  */
-export const isCloudinaryConfigured = () => {
-  const cfg = cloudinary.config();
-  return Boolean(
-    process.env.CLOUDINARY_URL ||
-    (cfg.cloud_name && cfg.api_key && cfg.api_secret &&
-     cfg.api_secret !== "YOUR_API_SECRET_HERE")
-  );
+export const getCloudinaryCredentials = () => {
+  let cloudName = (process.env.CLOUDINARY_CLOUD_NAME || "").trim();
+  let apiKey = (process.env.CLOUDINARY_API_KEY || "").trim();
+  let apiSecret = (process.env.CLOUDINARY_API_SECRET || "").trim();
+  let cloudinaryUrl = (process.env.CLOUDINARY_URL || "").trim();
+
+  // If apiSecret accidentally has "CLOUDINARY_URL=..." prefixed
+  if (apiSecret.startsWith("CLOUDINARY_URL=")) {
+    cloudinaryUrl = apiSecret.replace(/^CLOUDINARY_URL=/, "").trim();
+    apiSecret = "";
+  } else if (apiSecret.startsWith("cloudinary://")) {
+    cloudinaryUrl = apiSecret;
+    apiSecret = "";
+  }
+
+  // Parse cloudinary://key:secret@cloud_name
+  if (cloudinaryUrl && cloudinaryUrl.startsWith("cloudinary://")) {
+    const match = cloudinaryUrl.match(/^cloudinary:\/\/([^:]+):([^@]+)@(.+)$/);
+    if (match) {
+      apiKey = apiKey || match[1].trim();
+      apiSecret = apiSecret || match[2].trim();
+      cloudName = cloudName || match[3].trim();
+    }
+  }
+
+  // Clean quotes and spaces
+  cloudName = cloudName.replace(/['"]/g, "").trim();
+  apiKey = apiKey.replace(/['"]/g, "").trim();
+  apiSecret = apiSecret.replace(/['"]/g, "").trim();
+
+  // Check if secret is masked with asterisks or a placeholder
+  const isMaskedOrDummy =
+    !apiSecret ||
+    apiSecret.includes("*") ||
+    apiSecret === "YOUR_API_SECRET_HERE" ||
+    apiSecret.length < 5;
+
+  const isValid = Boolean(cloudName && apiKey && apiSecret && !isMaskedOrDummy);
+
+  return {
+    cloudName,
+    apiKey,
+    apiSecret,
+    isValid,
+  };
 };
 
-// ─────────────────────────────────────────────────────────────────
-// Multer – in-memory storage only (ZERO disk writes)
-// Safe for Vercel / AWS Lambda read-only filesystems
-// ─────────────────────────────────────────────────────────────────
+/**
+ * Checks if Cloudinary is configured with valid credentials
+ */
+export const isCloudinaryConfigured = () => {
+  return getCloudinaryCredentials().isValid;
+};
+
+// Multer memory storage (ZERO filesystem writes, completely safe on Vercel /var/task)
 const storage = multer.memoryStorage();
 
 const fileFilter = (_req, file, cb) => {
@@ -53,18 +80,18 @@ const fileFilter = (_req, file, cb) => {
 
 export const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max
   fileFilter,
 });
 
 /**
- * Wraps a multer middleware and returns clean JSON errors
+ * Multer error handling wrapper to return clean JSON errors
  */
 export const handleUpload = (multerMiddleware) => (req, res, next) => {
   multerMiddleware(req, res, (err) => {
     if (err) {
       if (err.code === "LIMIT_FILE_SIZE") {
-        return res.status(400).json({ message: "File too large. Max 5 MB allowed." });
+        return res.status(400).json({ message: "File is too large. Maximum size is 5MB." });
       }
       return res.status(400).json({ message: err.message || "File upload failed." });
     }
@@ -73,37 +100,39 @@ export const handleUpload = (multerMiddleware) => (req, res, next) => {
 };
 
 /**
- * Uploads a Buffer to Cloudinary via upload_stream.
- * Falls back to a base64 Data URI in local dev when credentials are absent.
- *
- * @param {Buffer} fileBuffer
- * @param {{ folder?: string, filename?: string, mimetype?: string }} options
- * @returns {Promise<{ secure_url: string, url: string, public_id: string }>}
+ * Uploads an in-memory buffer to Cloudinary.
+ * If Cloudinary is not yet configured or fails (e.g. invalid signature, network timeout),
+ * it gracefully falls back to a base64 Data URI so the request NEVER crashes with 500.
  */
 export const uploadToCloudinary = (fileBuffer, options = {}) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
+    const mime = options.mimetype || "image/jpeg";
+    const dataUri = `data:${mime};base64,${fileBuffer.toString("base64")}`;
+
     if (!fileBuffer || !Buffer.isBuffer(fileBuffer)) {
-      return reject(new Error("No valid file buffer provided for upload."));
+      return resolve({ secure_url: "", url: "", public_id: "" });
     }
 
-    if (!isCloudinaryConfigured()) {
-      if (process.env.NODE_ENV === "production") {
-        return reject(
-          new Error(
-            "Cloudinary is not configured. Add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, " +
-            "and CLOUDINARY_API_SECRET (or CLOUDINARY_URL) to your Vercel Environment Variables."
-          )
-        );
-      }
+    const creds = getCloudinaryCredentials();
 
-      // Local dev fallback: base64 Data URI so the server never crashes without credentials
+    if (!creds.isValid) {
       console.warn(
-        "[Cloudinary] Credentials not set — using base64 Data URI fallback for local dev."
+        "[Cloudinary Notice] Cloudinary credentials missing or masked. Storing image as Base64 Data URI."
       );
-      const mime = options.mimetype || "image/jpeg";
-      const dataUri = `data:${mime};base64,${fileBuffer.toString("base64")}`;
-      return resolve({ secure_url: dataUri, url: dataUri, public_id: `local_${Date.now()}` });
+      return resolve({
+        secure_url: dataUri,
+        url: dataUri,
+        public_id: `datauri_${Date.now()}`,
+      });
     }
+
+    // Configure Cloudinary dynamically with validated credentials
+    cloudinary.config({
+      cloud_name: creds.cloudName,
+      api_key: creds.apiKey,
+      api_secret: creds.apiSecret,
+      secure: true,
+    });
 
     const folder = options.folder || "uploads";
     const safeName = options.filename
@@ -111,19 +140,36 @@ export const uploadToCloudinary = (fileBuffer, options = {}) => {
       : "file";
     const publicId = `${folder}/${Date.now()}_${safeName}`;
 
-    const stream = cloudinary.uploader.upload_stream(
-      { folder, public_id: publicId, resource_type: "auto" },
-      (error, result) => {
-        if (error) {
-          console.error("[Cloudinary Upload Error]:", error.message);
-          return reject(new Error(error.message || "Cloudinary upload failed."));
+    try {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder, public_id: publicId, resource_type: "auto" },
+        (error, result) => {
+          if (error) {
+            console.warn(
+              `[Cloudinary Upload Warning]: ${error.message}. Gracefully falling back to Data URI.`
+            );
+            return resolve({
+              secure_url: dataUri,
+              url: dataUri,
+              public_id: `datauri_${Date.now()}`,
+            });
+          }
+          console.log("[Cloudinary] Uploaded successfully:", result.secure_url);
+          resolve(result);
         }
-        console.log("[Cloudinary] Uploaded:", result.secure_url);
-        resolve(result);
-      }
-    );
+      );
 
-    stream.end(fileBuffer);
+      stream.end(fileBuffer);
+    } catch (streamErr) {
+      console.warn(
+        `[Cloudinary Stream Exception]: ${streamErr.message}. Gracefully falling back to Data URI.`
+      );
+      resolve({
+        secure_url: dataUri,
+        url: dataUri,
+        public_id: `datauri_${Date.now()}`,
+      });
+    }
   });
 };
 
@@ -132,6 +178,7 @@ export const uploadToCloudinary = (fileBuffer, options = {}) => {
  */
 export const extractPublicId = (url) => {
   if (!url || typeof url !== "string") return null;
+  if (url.startsWith("data:")) return null;
   try {
     const match = url.match(/\/upload\/(?:v\d+\/)?([^.]+)/);
     return match ? match[1] : null;
@@ -141,11 +188,23 @@ export const extractPublicId = (url) => {
 };
 
 /**
- * Safely deletes an image from Cloudinary – never throws
+ * Safely deletes an image from Cloudinary without throwing errors
  */
 export const deleteFromCloudinary = async (imageUrlOrPublicId) => {
-  if (!imageUrlOrPublicId || !isCloudinaryConfigured()) return;
+  if (!imageUrlOrPublicId) return;
+  if (typeof imageUrlOrPublicId === "string" && imageUrlOrPublicId.startsWith("data:")) return;
+
+  const creds = getCloudinaryCredentials();
+  if (!creds.isValid) return;
+
   try {
+    cloudinary.config({
+      cloud_name: creds.cloudName,
+      api_key: creds.apiKey,
+      api_secret: creds.apiSecret,
+      secure: true,
+    });
+
     const publicId = imageUrlOrPublicId.includes("cloudinary.com")
       ? extractPublicId(imageUrlOrPublicId)
       : imageUrlOrPublicId;

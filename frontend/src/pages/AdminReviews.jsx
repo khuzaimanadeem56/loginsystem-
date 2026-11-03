@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Trash2, UserCircle, MessageSquareQuote, Loader2 } from "lucide-react";
-import { API_URL as API } from "../config/api";
+import { API_URL as API, getImageUrl } from "../config/api";
 
 function AdminReviews() {
   const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(true); // 👈 Loading state add ki
+  const [loading, setLoading] = useState(true); // ðŸ‘ˆ Loading state add ki
   const user = JSON.parse(localStorage.getItem("user"));
   useEffect(() => {
     if (!user || user.email !== "khuzi56@gmail.com") {
@@ -39,7 +39,7 @@ function AdminReviews() {
 
       const merged = data.map((r) => ({
         ...r,
-        userImage: r.userId && usersMap[r.userId] ? `${API}/uploads/${usersMap[r.userId].image}` : null,
+        userImage: r.userId && usersMap[r.userId]?.image ? getImageUrl(usersMap[r.userId].image) : null,
         userName: r.name || (r.userId && usersMap[r.userId] ? usersMap[r.userId].name : "User"),
       }));
 

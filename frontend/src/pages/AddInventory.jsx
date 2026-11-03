@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { motion, AnimatePresence } from "framer-motion";
 import { Package, Plus, Search, Image as ImageIcon, X, Edit, Trash2, Minus } from "lucide-react";
-import { API_URL as API } from "../config/api";
+import { API_URL as API, getImageUrl } from "../config/api";
 
 function AddInventory() {
   const [showModal, setShowModal] = useState(false);
@@ -73,7 +73,10 @@ function AddInventory() {
       const url = editingId ? `${API}/inventory/${editingId}` : `${API}/inventory`;
       const method = editingId ? "PUT" : "POST";
       const res = await fetch(url, { method, body: fd });
-      if (!res.ok) throw new Error("Server returned " + res.status);
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.message || ("Server returned " + res.status));
+      }
       const created = await res.json();
       // Ensure discount is preserved if backend doesn't return it
       created.discount = created.discount || discount || "0";
@@ -90,10 +93,12 @@ function AddInventory() {
       setEditingId(null);
       removeImage();
       setInStock(true);
-      setMessage({ type: "success", text: "Inventory saved" });
+      setMessage({ type: "success", text: "Inventory saved successfully." });
+      alert(editingId ? "Product updated successfully!" : "Product created successfully!");
     } catch (err) {
       console.error(err);
-      setMessage({ type: "error", text: "Failed to save." });
+      setMessage({ type: "error", text: err.message || "Failed to save." });
+      alert(err.message || "Failed to save product.");
     } finally {
       setSaving(false);
     }
@@ -109,7 +114,7 @@ function AddInventory() {
     setSale(it.sale || "");
     setDiscount(it.discount || "");
     setInStock(Boolean(it.inStock));
-    setPreview(it.image ? `${API}${it.image}` : null);
+    setPreview(it.image ? getImageUrl(it.image) : null);
     setShowModal(true);
   };
 
@@ -154,6 +159,11 @@ function AddInventory() {
                   </button>
                 </div>
 
+                {message && message.type === "error" && (
+                  <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold uppercase tracking-wider">
+                    {message.text}
+                  </div>
+                )}
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
                   <div className="md:col-span-1 flex flex-col items-center">
                     <div className="w-full h-64 bg-[#030712] border border-gray-800 rounded-2xl flex items-center justify-center overflow-hidden relative group">
@@ -213,7 +223,7 @@ function AddInventory() {
               <div key={it._id} className="group bg-[#111827] border border-gray-800 rounded-2xl overflow-hidden shadow-xl hover:shadow-cyan-900/10 transition-all flex flex-col">
                   <div className="relative h-56 bg-[#030712] overflow-hidden">
                   {it.image ? (
-                    <img src={`${API}${it.image}`} alt={it.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <img src={getImageUrl(it.image)} alt={it.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   ) : (
                     <div className="h-full w-full flex items-center justify-center text-gray-700 font-bold uppercase">No Image</div>
                   )}

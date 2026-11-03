@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { ShoppingCart, CreditCard, X, Trash2, Plus, Minus, MapPin, CheckCircle2, Wallet } from "lucide-react";
-import { API_URL as API } from "../config/api";
+import { API_URL as API, getImageUrl } from "../config/api";
 
 function Cart() {
   const [cart, setCart] = useState([]);
@@ -64,7 +64,7 @@ function Cart() {
           paymentMethod: selected,
           transactionId,
           address,
-          // user confirmed payment (entered TID) — treat as Approved
+          // user confirmed payment (entered TID) â€” treat as Approved
           status: 'Approved',
           date: new Date().toISOString()
         };
@@ -169,7 +169,7 @@ function Cart() {
                       className="bg-[#111827] border border-gray-800/50 rounded-2xl sm:rounded-3xl p-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 group hover:border-gray-700 transition-all"
                     >
                       <div className="w-24 h-24 rounded-2xl overflow-hidden border border-white/5 bg-black">
-                        <img src={`${API}${it.image}`} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                        <img src={getImageUrl(it.image)} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                       </div>
                       
                       <div className="flex-1 min-w-0">
