@@ -170,7 +170,7 @@ function Login() {
               Welcome
             </h1>
             <p className="text-[11px] sm:text-xs font-bold tracking-[0.26em] text-cyan-400 uppercase mt-2">
-              Georgia Lottery Portal
+              Khuzi Xcessories Portal
             </p>
             <p className="text-xs text-slate-400 leading-relaxed mt-4 max-w-[260px] hidden sm:block">
               Experience seamless management, real-time sync, and secured authentication in one unified portal.
